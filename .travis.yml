@@ -17,7 +17,7 @@ addons:
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$(echo ${PATH} | awk -v RS=':' -v ORS=':' '/clang/ {next} {print}' | sed 's/:*$//'); fi
-  - APMDIR=$(pwd) && pushd .. && $APMDIR/Tools/scripts/configure-ci.sh && . ~/.profile && popd
+  - Tools/scripts/configure-ci.sh
 
 script:
   - python Tools/autotest/param_metadata/param_parse.py
