@@ -104,7 +104,10 @@ def ap_program(bld, program_group='bin',
 
     kw['features'] = kw.get('features', []) + bld.env.AP_PROGRAM_FEATURES
 
-    name = os.path.join(program_group, program_name)
+    if program_group == 'bin':
+        name = os.path.join(program_group, program_name)
+    else:
+        name = os.path.join('bin', program_group, program_name)
 
     tg_constructor = bld.program
     if bld.env.AP_PROGRAM_AS_STLIB:
