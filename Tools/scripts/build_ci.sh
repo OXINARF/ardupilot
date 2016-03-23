@@ -85,7 +85,11 @@ for t in $CI_BUILD_TARGET; do
 
     if [[ -n ${waf_supported_boards[$t]} ]]; then
         echo "Starting waf build for board ${t}..."
-        $waf configure --board $t --enable-benchmarks --check-c-compiler="$c_compiler" --check-cxx-compiler="$cxx_compiler"
+        if [[ "$OS_NAME" == 'osx' ]]; then
+            $waf configure --board $t --check-c-compiler="$c_compiler" --check-cxx-compiler="$cxx_compiler"
+        else
+            $waf configure --board $t --enable-benchmarks --check-c-compiler="$c_compiler" --check-cxx-compiler="$cxx_compiler"
+        fi
         $waf clean
         $waf ${build_concurrency[$t]} all
         if [[ $t == linux ]]; then
