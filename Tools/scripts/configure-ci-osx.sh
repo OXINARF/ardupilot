@@ -43,6 +43,9 @@ popd
 
 mkdir -p $HOME/bin
 
+ln -s /usr/local/bin/gcc-4.9 ~/bin/gcc
+ln -s /usr/local/bin/g++-4.9 ~/bin/g++
+
 # configure ccache
 # ln -s /usr/bin/ccache ~/bin/g++
 # ln -s /usr/bin/ccache ~/bin/gcc
