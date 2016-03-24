@@ -48,6 +48,8 @@ def libbenchmark(bld):
         cmake_vars=dict(
             CMAKE_BUILD_TYPE='Release',
             CMAKE_INSTALL_PREFIX=prefix_node.abspath(),
+            CMAKE_C_COMPILER=bld.env.get_flat('CC'),
+            CMAKE_CXX_COMPILER=bld.env.get_flat('CXX'),
         )
     )
 
