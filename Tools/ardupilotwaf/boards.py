@@ -131,7 +131,8 @@ class Board:
 
         if 'darwin' in cfg.env.DEST_OS:
             env.LINKFLAGS += [
-                '-Wl,-dead_strip'
+                '-Wl,-dead_strip',
+                '-v'
             ]
         else:
             env.LINKFLAGS += [
