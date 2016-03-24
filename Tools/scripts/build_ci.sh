@@ -64,7 +64,7 @@ for board in $($waf list_boards | head -n1); do waf_supported_boards[$board]=1; 
 echo "Targets: $CI_BUILD_TARGET"
 for t in $CI_BUILD_TARGET; do
     # skip make-based build for clang
-    if [[ "$cxx_compiler" != "clang++" ]]; then
+    if [[ "$cxx_compiler" != "clang++" && "$OS_NAME" != "osx" ]]; then
         echo "Starting make based build for target ${t}..."
         for v in ${!build_platforms[@]}; do
             if [[ ${build_platforms[$v]} != *$t* ]]; then
@@ -87,7 +87,7 @@ for t in $CI_BUILD_TARGET; do
         echo "Starting waf build for board ${t}..."
         $waf configure --board $t --enable-benchmarks --check-c-compiler="$c_compiler" --check-cxx-compiler="$cxx_compiler"
         $waf clean
-        $waf ${build_concurrency[$t]} all
+        $waf -vv ${build_concurrency[$t]} all
         if [[ $t == linux ]]; then
             $waf check
         fi
