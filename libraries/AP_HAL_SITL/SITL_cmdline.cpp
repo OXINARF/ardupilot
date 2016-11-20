@@ -204,8 +204,7 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
         }
         break;
         case 'P':
-            _set_param_default(gopt.optarg);
-            break;
+            continue;
         case 'S':
             _synthetic_clock_mode = true;
             break;
@@ -297,6 +296,45 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
     }
 
     _sitl_setup(home_str);
+}
+
+void SITL_State::_parse_param_options(int argc, char * const argv[])
+{
+    const struct GetOptLong::option options[] = {
+        {"speedup", true, 0, 's'},
+        {"param",   true, 0, 'P'},
+        {0, false, 0, 0}
+    };
+
+    int opt;
+    GetOptLong gopt(argc, argv, "s:P:", options);
+
+    while ((opt = gopt.getoption()) != -1) {
+        switch (opt) {
+        case 'P': {
+            char *pdup = strdup(gopt.optarg);
+            char *p = strchr(pdup, '=');
+            
+            if (p == nullptr) {
+                printf("Please specify parameter as NAME=VALUE");
+                exit(1);
+            }
+            
+            float value = strtof(p+1, nullptr);
+            *p = 0;
+            _set_param_default(pdup, value);
+            free(pdup);
+            break;
+        }
+        case 's': {
+            float speedup = strtof(gopt.optarg, nullptr);
+            _set_param_default("SIM_SPEEDUP", speedup);
+            break;
+        }
+        default:
+            continue;
+        }
+    }
 }
 
 #endif

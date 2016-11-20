@@ -81,6 +81,7 @@ void HAL_SITL::run(int argc, char * const argv[], Callbacks* callbacks) const
     analogin->init();
 
     callbacks->setup();
+    _sitl_state->setup(argc, argv);
     scheduler->system_initialized();
 
     for (;;) {
