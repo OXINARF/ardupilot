@@ -620,7 +620,8 @@ def start_vehicle(binary, autotest, opts, stuff, loc):
     if opts.wipe_eeprom:
         cmd.append("-w")
     cmd.extend(["--model", stuff["model"]])
-    cmd.extend(["--speedup", str(opts.speedup)])
+    if opts.speedup:
+        cmd.extend(["--speedup", str(opts.speedup)])
     if opts.sitl_instance_args:
         cmd.extend(opts.sitl_instance_args.split(" "))  # this could be a lot better..
     if opts.mavlink_gimbal:
@@ -739,7 +740,7 @@ group_sim.add_option("-B", "--breakpoint", type='string', action="append", defau
 group_sim.add_option("-M", "--mavlink-gimbal", action='store_true', default=False, help="enable MAVLink gimbal")
 group_sim.add_option("-L", "--location", type='string', default='CMAC', help="select start location from Tools/autotest/locations.txt")
 group_sim.add_option("-l", "--custom-location", type='string', default=None, help="set custom start location")
-group_sim.add_option("-S", "--speedup", default=1, type='int', help="set simulation speedup (1 for wall clock time)")
+group_sim.add_option("-S", "--speedup", type='int', help="set simulation speedup (1 for wall clock time)")
 group_sim.add_option("-t", "--tracker-location", default='CMAC_PILOTSBOX', type='string', help="set antenna tracker start location")
 group_sim.add_option("-w", "--wipe-eeprom", action='store_true', default=False, help="wipe EEPROM and reload parameters")
 group_sim.add_option("-m", "--mavproxy-args", default=None, type='string', help="additional arguments to pass to mavproxy.py")
@@ -853,7 +854,7 @@ else:
 
 if cmd_opts.hil:
     # (unlikely)
-    run_in_terminal_window(find_autotest_dir(), "JSBSim", [os.path.join(find_autotest_dir(), "jsb_sim/runsim.py"), "--home", location, "--speedup=" + str(cmd_opts.speedup)])
+    run_in_terminal_window(find_autotest_dir(), "JSBSim", [os.path.join(find_autotest_dir(), "jsb_sim/runsim.py"), "--home", location, "--speedup=" + str(cmd_opts.speedup or 1)])
 else:
     if not cmd_opts.no_rebuild:  # i.e. we should rebuild
         do_build(vehicle_dir, cmd_opts, frame_infos)
