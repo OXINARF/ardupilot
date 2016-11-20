@@ -376,7 +376,6 @@ void Aircraft::fill_fdm(struct sitl_fdm &fdm)
 
     if (last_speedup != sitl->speedup && sitl->speedup > 0) {
         set_speedup(sitl->speedup);
-        last_speedup = sitl->speedup;
     }
 }
 
@@ -406,6 +405,7 @@ uint64_t Aircraft::get_wall_time_us() const
 void Aircraft::set_speedup(float speedup)
 {
     setup_frame_time(rate_hz, speedup);
+    last_speedup = speedup;
 }
 
 /*
