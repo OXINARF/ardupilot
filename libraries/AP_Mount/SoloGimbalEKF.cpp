@@ -37,7 +37,7 @@ SoloGimbalEKF::SoloGimbalEKF(const AP_AHRS_NavEKF &ahrs) :
     reset();
 }
 
-template<int s> struct Wow;
+//template<int s> struct Wow;
 
 // complete reset
 void SoloGimbalEKF::reset()
@@ -45,8 +45,8 @@ void SoloGimbalEKF::reset()
     memset(&states,0,sizeof(states));
     memset(&gSense,0,sizeof(gSense));
     memset(&Cov,0,sizeof(Cov));
-
-    Wow<sizeof(states)> wow;
+    int num_states = sizeof(states);
+//    Wow<sizeof(states)> wow;
     TiltCorrection = 0;
     StartTime_ms = 0;
     FiltInit = false;
