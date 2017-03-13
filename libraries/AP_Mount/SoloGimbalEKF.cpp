@@ -42,10 +42,11 @@ SoloGimbalEKF::SoloGimbalEKF(const AP_AHRS_NavEKF &ahrs) :
 // complete reset
 void SoloGimbalEKF::reset()
 {
-    memset(&states,0,sizeof(states));
+    int num_states = sizeof(states);
+    memset(&states,0,num_states);
     memset(&gSense,0,sizeof(gSense));
     memset(&Cov,0,sizeof(Cov));
-    int num_states = sizeof(states);
+
 //    Wow<sizeof(states)> wow;
     TiltCorrection = 0;
     StartTime_ms = 0;
