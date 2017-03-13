@@ -144,6 +144,9 @@ private:
     // States used for unwrapping of compass yaw error
     float innovationIncrement;
     float lastInnovation;
+    
+    template<int s> struct Wow;
+    Wow<sizeof(states)> wow;
 
     // state prediction
     void predictStates();
