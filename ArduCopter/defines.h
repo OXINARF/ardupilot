@@ -476,6 +476,7 @@ enum DevOptions {
 #define FS_THR_ENABLED_ALWAYS_RTL          1
 #define FS_THR_ENABLED_CONTINUE_MISSION    2
 #define FS_THR_ENABLED_ALWAYS_LAND         3
+#define FS_THR_PERCEPTO                    9
 
 // Battery failsafe definitions (FS_BATT_ENABLE parameter)
 #define FS_BATT_DISABLED                    0       // battery failsafe disabled

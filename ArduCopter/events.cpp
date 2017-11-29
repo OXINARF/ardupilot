@@ -18,6 +18,22 @@ void Copter::failsafe_radio_on_event()
             // continue mission
         } else if (control_mode == LAND && g.failsafe_battery_enabled == FS_BATT_LAND && failsafe.battery) {
             // continue landing
+        } else if (g.failsafe_throttle == FS_THR_PERCEPTO) {
+            switch (control_mode) {
+                case AUTO:
+                case LAND:
+                case RTL:
+                    // continue in current mode
+                    break;
+
+                default: {
+                    if (mission.num_commands() > 1 && set_mode(AUTO, MODE_REASON_RADIO_FAILSAFE)) {
+                        // mission started
+                        break;
+                    }
+                    set_mode_RTL_or_land_with_pause(MODE_REASON_RADIO_FAILSAFE);
+                }
+            }
         } else {
             if (g.failsafe_throttle == FS_THR_ENABLED_ALWAYS_LAND) {
                 set_mode_land_with_pause(MODE_REASON_RADIO_FAILSAFE);
