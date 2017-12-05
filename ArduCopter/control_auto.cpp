@@ -20,7 +20,7 @@
 // auto_init - initialise auto controller
 bool Copter::auto_init(bool ignore_checks)
 {
-    if ((position_ok() && mission.num_commands() > 1) || ignore_checks) {
+    if ((position_ok() && mission.num_commands() > 1 && mission.can_run()) || ignore_checks) {
         auto_mode = Auto_Loiter;
 
         // reject switching to auto mode if landed with motors armed but first command is not a takeoff (reduce chance of flips)
