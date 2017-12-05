@@ -411,6 +411,17 @@ void GCS_MAVLINK::handle_mission_count(AP_Mission &mission, mavlink_message_t *m
         return;
     }
 
+    // check if upload is possible
+    if (!mission.can_upload()) {
+        // send NAK
+        mavlink_msg_mission_ack_send(chan, msg->sysid, msg->compid, MAV_MISSION_ERROR,
+                                     MAV_MISSION_TYPE_MISSION);
+        return;
+    }
+
+    // notify mission library that new mission will be written
+    mission.set_upload_in_progress(true);
+
     // new mission arriving, truncate mission to be the same length
     mission.truncate(packet.count);
 
@@ -455,10 +466,14 @@ void GCS_MAVLINK::handle_mission_write_partial_list(AP_Mission &mission, mavlink
     // start waypoint receiving
     if ((unsigned)packet.start_index > mission.num_commands() ||
         (unsigned)packet.end_index > mission.num_commands() ||
-        packet.end_index < packet.start_index) {
+        packet.end_index < packet.start_index ||
+        !mission.can_upload()) {
         send_text(MAV_SEVERITY_WARNING,"Flight plan update rejected");
         return;
     }
+
+    // notify mission library that new commands will be written
+    mission.set_upload_in_progress(true);
 
     waypoint_timelast_receive = AP_HAL::millis();
     waypoint_timelast_request = 0;
@@ -632,6 +647,7 @@ bool GCS_MAVLINK::handle_mission_item(mavlink_message_t *msg, AP_Mission &missio
         
         send_text(MAV_SEVERITY_INFO,"Flight plan received");
         waypoint_receiving = false;
+        mission.set_upload_in_progress(false);
         mission_is_complete = true;
         // XXX ignores waypoint radius for individual waypoints, can
         // only set WP_RADIUS parameter
