@@ -39,6 +39,7 @@
 
 #define AP_MISSION_OPTIONS_DEFAULT          0       // Do not clear the mission when rebooting
 #define AP_MISSION_MASK_MISSION_CLEAR       (1<<0)  // If set then Clear the mission on boot
+#define AP_MISSION_MASK_MISSION_VALIDATION  (1<<1)  // If set then mission can't run while upload is in progress and upload can't happen if mission is running
 
 /// @class    AP_Mission
 /// @brief    Object managing Mission
@@ -334,6 +335,15 @@ public:
     ///     should be called at 10hz or higher
     void update();
 
+    /// set_upload_in_progress - notify this library when command writes will start and stop
+    void set_upload_in_progress(bool on) { _upload_in_progress = on; }
+
+    /// can_upload - checks if it is possible to upload new commands
+    bool can_upload() const;
+
+    /// can_run - checks if mission can be run when method is called
+    bool can_run() const;
+
     ///
     /// public command methods
     ///
@@ -519,4 +529,6 @@ private:
 
     // last time that mission changed
     uint32_t _last_change_time_ms;
+
+    bool _upload_in_progress;  // if true, writing new commands is happening
 };

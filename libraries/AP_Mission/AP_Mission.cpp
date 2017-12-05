@@ -25,7 +25,7 @@ const AP_Param::GroupInfo AP_Mission::var_info[] = {
     // @Param: OPTIONS
     // @DisplayName: Mission options bitmask
     // @Description: Bitmask of what options to use in missions.
-    // @Bitmask: 0:Clear Mission on reboot
+    // @Bitmask: 0:Clear Mission on reboot, 1:Running and upload mission aren't allowed at the same time
     // @User: Advanced
     AP_GROUPINFO("OPTIONS",  2, AP_Mission, _options, AP_MISSION_OPTIONS_DEFAULT),
 
@@ -66,6 +66,10 @@ void AP_Mission::init()
 ///     To-Do: should we validate the mission first and return true/false?
 void AP_Mission::start()
 {
+    if (!can_run()) {
+        return;
+    }
+
     _flags.state = MISSION_RUNNING;
 
     reset(); // reset mission to the first command, resets jump tracking
@@ -87,6 +91,10 @@ void AP_Mission::stop()
 ///     previous running commands will be re-initialized
 void AP_Mission::resume()
 {
+    if (!can_run()) {
+        return;
+    }
+
     // if mission had completed then start it from the first command
     if (_flags.state == MISSION_COMPLETE) {
         start();
@@ -244,6 +252,26 @@ void AP_Mission::update()
             _flags.do_cmd_loaded = false;
         }
     }
+}
+
+/// can_upload - checks if it is possible to upload new commands
+bool AP_Mission::can_upload() const
+{
+    if ((AP_MISSION_MASK_MISSION_VALIDATION & _options) && _flags.state == MISSION_RUNNING) {
+        return false;
+    }
+
+    return true;
+}
+
+/// can_run - checks if mission can be run when method is called
+bool AP_Mission::can_run() const
+{
+    if ((AP_MISSION_MASK_MISSION_VALIDATION & _options) && _upload_in_progress) {
+        return false;
+    }
+
+    return true;
 }
 
 ///
@@ -488,6 +516,11 @@ bool AP_Mission::write_cmd_to_storage(uint16_t index, Mission_Command& cmd)
 {
     // range check cmd's index
     if (index >= num_commands_max()) {
+        return false;
+    }
+
+    // check if writes are allowed
+    if (!can_upload()) {
         return false;
     }
 
