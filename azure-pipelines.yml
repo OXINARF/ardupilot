@@ -1,0 +1,16 @@
+
+jobs:
+- job: 'Windows Cygwin SITL build'
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - script: choco install cygwin --params "/InstallDir:C\Cygwin /NoStartMenu /NoAdmin"
+    name: 'Install Cygwin'
+  - script: choco install gcc-g++ libxml2-devel libxslt-devel python2-devel python2-future python2-libxml2 python2-pip --source cygwin
+    name: 'Install Cygwin packages'
+  - script: C:\Cygwin\bin\bash --login './waf all'
+    name: 'Build SITL'
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'Build artifacts'
+      targetPath: 'build/sitl/bin'
