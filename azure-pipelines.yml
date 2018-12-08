@@ -5,7 +5,7 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-  - script: choco install cygwin --params "/InstallDir:C\Cygwin /NoStartMenu /NoAdmin"
+  - script: choco install cygwin --params "/InstallDir:C:\Cygwin /NoStartMenu /NoAdmin"
     displayName: 'Install Cygwin'
   - script: choco install gcc-g++ libxml2-devel libxslt-devel python2-devel python2-future python2-libxml2 python2-pip --source cygwin
     displayName: 'Install Cygwin packages'
