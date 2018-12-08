@@ -9,9 +9,10 @@ jobs:
     displayName: 'Install Cygwin'
   - script: choco install gcc-g++ libxml2-devel libxslt-devel python2-devel python2-future python2-libxml2 python2-pip --source cygwin
     displayName: 'Install Cygwin packages'
-  - script: C:\Cygwin\bin\bash --login './waf all'
+  - script: C:\Cygwin\bin\bash --login 'cd $(cygpath %BUILD_SOURCESDIRECTORY%) && ./waf all'
     displayName: 'Build SITL'
   - task: PublishPipelineArtifact@0
+    displayName: 'Publish build artifacts'
     inputs:
       artifactName: 'Build artifacts'
       targetPath: 'build/sitl/bin'
