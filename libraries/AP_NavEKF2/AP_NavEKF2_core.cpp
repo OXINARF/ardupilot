@@ -246,6 +246,7 @@ void NavEKF2_core::InitialiseVariables()
     velResetNE.zero();
     posResetD = 0.0f;
     hgtInnovFiltState = 0.0f;
+    velErrUnconstrained = false;
     if (_ahrs->get_compass()) {
         magSelectIndex = _ahrs->get_compass()->get_primary();
     }
