@@ -68,6 +68,8 @@ protected:
     AP_Int16                checks_to_perform;      // bitmask for which checks are required
     AP_Float                accel_error_threshold;
     AP_Float                _min_voltage[AP_BATT_MONITOR_MAX_INSTANCES];
+    AP_Int16                _magfield_min;
+    AP_Int16                _magfield_max;
 
     // references
     const AP_AHRS           &ahrs;
@@ -104,4 +106,9 @@ protected:
 
     virtual enum HomeState home_status() const = 0;
 
+    // get min magnetic field strength
+    uint16_t compass_magfield_min() const;
+
+    // get max magnetic field strength
+    uint16_t compass_magfield_max() const;
 };

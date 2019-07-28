@@ -70,6 +70,24 @@ const AP_Param::GroupInfo AP_Arming::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("VOLT2_MIN",     5,     AP_Arming,  _min_voltage[1],  0),
 
+    // @Param: MAGF_MIN
+    // @DisplayName: Minimum magnetic field strength
+    // @Description: The minimum magnetic field strength acceptable to arm, 0 uses standard value
+    // @Units: Milligauss
+    // @Increment: 1
+    // @Range: 0 15000
+    // @User: Advanced
+    AP_GROUPINFO("MAGF_MIN",     62,     AP_Arming,  _magfield_min,  0),
+
+    // @Param: MAGF_MAX
+    // @DisplayName: Maximum magnetic field strength
+    // @Description: The maximum magnetic field strength acceptable to arm, 0 uses standard value
+    // @Units: Milligauss
+    // @Increment: 1
+    // @Range: 0 15000
+    // @User: Advanced
+    AP_GROUPINFO("MAGF_MIN",     63,     AP_Arming,  _magfield_max,  0),
+
     AP_GROUPEND
 };
 
@@ -98,6 +116,16 @@ AP_Arming::AP_Arming(const AP_AHRS &ahrs_ref, const AP_Baro &baro, Compass &comp
 uint16_t AP_Arming::compass_magfield_expected() const
 {
     return AP_ARMING_COMPASS_MAGFIELD_EXPECTED;
+}
+
+uint16_t AP_Arming::compass_magfield_min() const
+{
+    return _magfield_min > 0 ? constrain_int16(_magfield_min, 1, 15000) : AP_ARMING_COMPASS_MAGFIELD_MIN;
+}
+
+uint16_t AP_Arming::compass_magfield_max() const
+{
+    return _magfield_max > 0 ? constrain_int16(_magfield_max, 1, 15000) : AP_ARMING_COMPASS_MAGFIELD_MAX;
 }
 
 bool AP_Arming::is_armed()
@@ -318,7 +346,7 @@ bool AP_Arming::compass_checks(bool report)
 
         // check for unreasonable mag field length
         float mag_field = _compass.get_field().length();
-        if (mag_field > AP_ARMING_COMPASS_MAGFIELD_MAX || mag_field < AP_ARMING_COMPASS_MAGFIELD_MIN) {
+        if (mag_field > compass_magfield_max() || mag_field < compass_magfield_min()) {
             if (report) {
                 GCS_MAVLINK::send_statustext_all(MAV_SEVERITY_CRITICAL, "PreArm: Check mag field");
             }
