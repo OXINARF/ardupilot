@@ -86,7 +86,7 @@ const AP_Param::GroupInfo AP_Arming::var_info[] = {
     // @Increment: 1
     // @Range: 0 15000
     // @User: Advanced
-    AP_GROUPINFO("MAGF_MIN",     63,     AP_Arming,  _magfield_max,  0),
+    AP_GROUPINFO("MAGF_MAX",     63,     AP_Arming,  _magfield_max,  0),
 
     AP_GROUPEND
 };
