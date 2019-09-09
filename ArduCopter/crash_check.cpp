@@ -63,6 +63,8 @@ void Copter::crash_check()
 void Copter::parachute_check()
 {
     static uint16_t control_loss_count;	// number of iterations we have been out of control
+    static uint32_t last_gcs_sent = 0;
+    static uint8_t last_gcs_type = 0;
 
     // exit immediately if parachute is not enabled
     if (!parachute.enabled()) {
@@ -75,24 +77,57 @@ void Copter::parachute_check()
     // return immediately if motors are not armed or pilot's throttle is above zero
     if (!motors->armed()) {
         control_loss_count = 0;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 1) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: motors not armed, reset counter");
+            last_gcs_sent = now;
+            last_gcs_type = 1;
+        }
         return;
     }
 
     // return immediately if we are not in an angle stabilize flight mode or we are flipping
     if (control_mode == ACRO || control_mode == FLIP) {
         control_loss_count = 0;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 2) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: acro or flip, reset counter");
+            last_gcs_sent = now;
+            last_gcs_type = 2;
+        }
         return;
     }
 
     // ensure we are flying
     if (ap.land_complete) {
         control_loss_count = 0;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 3) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: landed, reset counter");
+            last_gcs_sent = now;
+            last_gcs_type = 3;
+        }
         return;
     }
 
+    Log_Write_Data(101, baro_climbrate);
     // ensure we are going down
     if (is_positive(baro_climbrate)) {
         control_loss_count = 0;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 4) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: climbing, reset counter");
+            last_gcs_sent = now;
+            last_gcs_type = 4;
+        }
         return;
     }
 
@@ -103,9 +138,25 @@ void Copter::parachute_check()
 
     // check for angle error over 30 degrees
     const float angle_error = attitude_control->get_att_error_angle_deg();
+    Log_Write_Data(102, angle_error);
     if (angle_error <= CRASH_CHECK_ANGLE_DEVIATION_DEG) {
+        uint32_t now = AP_HAL::millis();
+
         if (control_loss_count > 0) {
             control_loss_count--;
+            Log_Write_Data(100, control_loss_count);
+
+            if (now - last_gcs_sent > 500 || last_gcs_type != 5) {
+                gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: good angle error, reduce counter: %d", control_loss_count);
+                last_gcs_sent = now;
+                last_gcs_type = 5;
+            }
+        }
+
+        if (now - last_gcs_sent > 500 || last_gcs_type != 5) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: good angle error, counter is 0");
+            last_gcs_sent = now;
+            last_gcs_type = 5;
         }
         return;
     }
@@ -113,9 +164,25 @@ void Copter::parachute_check()
     // increment counter
     if (control_loss_count < (PARACHUTE_CHECK_TRIGGER_SEC*scheduler.get_loop_rate_hz())) {
         control_loss_count++;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 6) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: increase counter: %d", control_loss_count);
+            last_gcs_sent = now;
+            last_gcs_type = 6;
+        }
     } else { // loss of control for at least 1 second
         // reset control loss counter
         control_loss_count = 0;
+        Log_Write_Data(100, control_loss_count);
+
+        uint32_t now = AP_HAL::millis();
+        if (now - last_gcs_sent > 500 || last_gcs_type != 7) {
+            gcs().send_text(MAV_SEVERITY_DEBUG, "PARACHUTE: loss of control! Releasing!");
+            last_gcs_sent = now;
+            last_gcs_type = 7;
+        }
         // log an error in the dataflash
         Log_Write_Error(ERROR_SUBSYSTEM_CRASH_CHECK, ERROR_CODE_CRASH_CHECK_LOSS_OF_CONTROL);
         // release parachute
