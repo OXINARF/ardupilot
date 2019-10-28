@@ -54,7 +54,6 @@ void Copter::crash_check()
 #if PARACHUTE == ENABLED
 
 // Code to detect a crash main ArduCopter code
-#define PARACHUTE_CHECK_TRIGGER_SEC         1       // 1 second of loss of control triggers the parachute
 #define PARACHUTE_CHECK_ANGLE_DEVIATION_CD  3000    // 30 degrees off from target indicates a loss of control
 
 // parachute_check - disarms motors and triggers the parachute if serious loss of control has been detected
@@ -92,7 +91,13 @@ void Copter::parachute_check()
 
     // ensure we are going down
     if (is_positive(baro_climbrate)) {
-        control_loss_count = 0;
+        // only reset count if both agree that we are climbing
+        if (climb_rate > 0) {
+            control_loss_count = 0;
+        }
+        return;
+    } else if (climb_rate > 0) {
+        // baro and AHRS have different climb rate signal, don't reset, but don't increase
         return;
     }
 
@@ -111,7 +116,7 @@ void Copter::parachute_check()
     }
 
     // increment counter
-    if (control_loss_count < (PARACHUTE_CHECK_TRIGGER_SEC*scheduler.get_loop_rate_hz())) {
+    if (control_loss_count < (uint32_t(g2.parachute_trigger_delay) * scheduler.get_loop_rate_hz() / 1000)) {
         control_loss_count++;
     } else { // loss of control for at least 1 second
         // reset control loss counter

@@ -986,6 +986,15 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
 #endif
 
+    // @Param: CHUTE_TRIG_DELAY
+    // @DisplayName: Parachute trigger delay
+    // @Description: The time it will take before automatic parachute will trigger
+    // @Units: ms
+    // @Range: 250 5000
+    // @Increment: 10
+    // @User: Standard
+    AP_GROUPINFO("CHUTE_TRIG_DELAY", 63, ParametersG2, parachute_trigger_delay, 500),
+
     AP_GROUPEND
 };
 

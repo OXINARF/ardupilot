@@ -587,6 +587,8 @@ public:
     AP_Follow follow;
 #endif
 
+    AP_Int16 parachute_trigger_delay;
+
 };
 
 extern const AP_Param::Info        var_info[];
