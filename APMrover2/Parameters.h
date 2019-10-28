@@ -398,6 +398,9 @@ public:
 
     // FS options
     AP_Int32 fs_options;
+
+    // ADC Logging
+    AP_ADC_Log adc_log;
 };
 
 extern const AP_Param::Info var_info[];
